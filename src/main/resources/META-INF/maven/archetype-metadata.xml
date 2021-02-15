@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor
+        xsi:schemaLocation="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0 http://maven.apache.org/xsd/archetype-descriptor-1.1.0.xsd"
+        name="zmj-demo-archetype"
+        xmlns="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>src/main/build</directory>
+            <includes>
+                <include>**/*.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory>src/main/bin</directory>
+            <includes>
+                <include>**/*.sh</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.yml</include>
+            </includes>
+        </fileSet>
+
+        <fileSet encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.ttf</include>
+            </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory/>
+            <includes>
+                <include>.gitignore</include>
+                <include>dockerfile</include>
+                <include>P3C-CodeStyle.xml</include>
+                <include>update.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory/>
+            <includes>
+                <include>*-aliyun.yaml</include>
+                <include>*-cloud.yaml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    <requiredProperties>
+        <requiredProperty key="artifactIdCamelCase">
+            <defaultValue>
+                ${package.getClass().forName("org.apache.velocity.util.StringUtils").removeAndHump("$artifactId", "-")}
+            </defaultValue>
+        </requiredProperty>
+        <requiredProperty key="artifactIdZmjRemove">
+            <defaultValue>
+                ${artifactId.substring(4)}
+            </defaultValue>
+        </requiredProperty>
+        <requiredProperty key="artifactIdCamelCaseZmjRemove">
+            <defaultValue>
+                ${package.getClass().forName("org.apache.velocity.util.StringUtils").removeAndHump("$artifactId", "-").substring(3)}
+            </defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+</archetype-descriptor>

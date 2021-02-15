@@ -1,0 +1,103 @@
+server:
+  # 服务端口
+  port: 80
+  compression:
+    # 指定要压缩的mime-type,多个以逗号分隔.
+    mime-types: application/json
+    # 是否开启压缩,默认为false,Spring Boot默认没有启用Http包压缩功能，但是压缩对减少带宽和加快页面加载非常有用。
+    enabled: true
+    # 执行压缩的阈值,默认为2048
+    min-response-size: 2KB
+spring:
+  profiles:
+    active: dev
+  application:
+    name: ${artifactId}
+  datasource:
+    url: jdbc:postgresql://192.168.175.228:5432/LongWall_Automation_Edge
+    username: postgres
+    password: postgres  #密码
+    driverClassName: org.postgresql.Driver
+    druid:
+      # 初始化大小
+      initial-size: 0
+      # 最大连接数
+      max-active: 10
+      # 最小连接池数量
+      min-idle: 0
+      # 获取连接等待超时的时间 ms
+      max-wait: 60000
+      # 保持连接
+      keep-alive: true
+      # 心跳检测语句
+      validation-query: 'SELECT 1'
+      # 申请连接时执行validationQuery检测连接是否有效
+      test-on-borrow: false
+      # 归还连接时执行validationQuery检测连接是否有效
+      test-on-return: false
+      # 申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis 执行validationQuery检测连接是否有效
+      # 建议配置为true，不影响性能，并且保证安全性
+      test-while-idle: true
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      # 检测时:1.如果连接空闲并且超过minIdle以外的连接，如果空闲时间超过minEvictableIdleTimeMillis设置的值则直接物理关闭。2.在minIdle以内的不处理。
+      time-between-eviction-runs-millis: 600000
+      # 配置一个连接在池中最大空闲时间，单位是毫秒 由于RDS中的wait_timeout是86400s，也就是24小时，所以需要在24小时内做检查，避免使用了已被销毁的连接
+      # 配置使用默认值即可
+      # 之前查询wait_timeout为7200s，是因为是在mysql客户端查询的，其实其值是interactive_timeout，该值和wait_timeout的含义是不同的，如果在程序中查询会发现wait_timeout的值变化了
+      max-evictable-idle-time-millis: 25200000
+      # 连接从连接池借出后，长时间不归还，将触发强制回连接 (一般在测试环境使用，在正式环境不要开启)
+      # 回收周期随timeBetweenEvictionRunsMillis进行，如果连接为从连接池借出状态，并且未执行任何sql，并且从借出时间起已超过removeAbandonedTimeout时间，则强制归还连接到连接池中。
+      #        remove-abandoned: true
+      # 连接池泄露超时时间 ms
+      #        remove-abandoned-timeout-millis: 30000
+      # 查询超时时间 1分钟
+      query-timeout: 60
+      # 将当前关闭动作记录到日志
+      log-abandoned: true
+      # socketTimeout通过TCP连接发送数据(在这里就是要执行的sql)后，等待响应的超时时间 1min
+      # connectTimeout数据库驱动(mysql-connector-java)与mysql服务器建立TCP连接的超时时间 5s
+      connection-properties: 'socketTimeout=60000;connectTimeout=5000'
+      filters: stat
+      stat-view-servlet:
+        enabled: true
+        allow:
+        login-username: 'zmj'
+        login-password: 'zmj!@#123'
+      web-stat-filter:
+        enabled: true
+mapper:
+  check-example-entity-class: true
+  wrapKeyword: '`{0}`'
+  mappers:
+    - ${package}.base.CommonMapper
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${artifactId}
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://192.168.175.228:5432/LongWall_Automation_Edge
+---
+# 该环境禁止删除，发布k8s要使用
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:postgresql://192.168.175.228:5432/LongWall_Automation_CloudCode
+---
+# 该环境禁止删除，发布k8s要使用
+spring:
+  config:
+    activate:
+      on-profile: product
+  datasource:
+    url: jdbc:postgresql://172.26.119.217:5432/LongWall_Automation_CloudCode

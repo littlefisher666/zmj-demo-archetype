@@ -1,0 +1,77 @@
+##################################################
+# zmj-user cloud Deployment
+##################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${artifactId}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${artifactId}
+  template:
+    metadata:
+      labels:
+        app: ${artifactId}
+    spec:
+      containers:
+        - name: ${artifactId}
+          image: 192.168.175.226:80/cloud/zmj/${artifactId}:latest
+          imagePullPolicy: Always
+          ports:
+            - protocol: TCP
+              containerPort: 80
+          env:
+            - name: PODIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          volumeMounts:
+            - name: date-config
+              mountPath: /etc/localtime
+      volumes:
+        - name: date-config
+          hostPath:
+            path: /etc/localtime
+---
+##################################################
+# zmj-user cloud Service
+##################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${artifactId}-svc
+spec:
+  ports:
+    - name: server
+      port: 80
+  selector:
+    app: ${artifactId}
+  type: NodePort
+---
+##################################################
+# zmj-user cloud Ingress
+##################################################
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ${artifactId}-ing
+spec:
+  rules:
+    - host: ${artifactIdZmjRemove}.biz.ingress.zmjemc.xyz
+      http:
+        paths:
+          - backend:
+              serviceName: ${artifactId}-svc
+              servicePort: 80
